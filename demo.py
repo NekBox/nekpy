@@ -27,11 +27,20 @@ def run(config, workdir):
     chdir(workdir) 
     cmd = ["/home/maxhutch/bin/nekmpi", "test", "{}".format(int(config["procs"]))]
     res = call(cmd)
-    return res
+    config['runstat'] = res
+    return config
 
 @delayed
-def report(rets):
-    print(rets)
+def analyze(config, workdir):
+    chdir(workdir)
+    cmd = ["/home/maxhutch/src/nek-analyze/load.py", "./test", "-f", "1", "-e", "2"]
+    res = call(cmd)
+    config['analyzestat'] = res
+    return config
+
+@delayed
+def report(configs):
+    print(len(configs))
     return
 
 from sys import argv
@@ -41,12 +50,14 @@ with open(argv[1], "r") as f:
 tusr = argv[2]
 
 courants = [0.1, 0.2, 0.3, 0.4]
+#courants = [0.1]
 overrides = [{"courant": x} for x in courants]
 workdirs = ["/home/maxhutch/src/nek_dask/test_{}".format(x) for x in courants]
 configs = [prepare(base, tusr, override, workdir) for override, workdir in zip(overrides, workdirs)]
 runs = [run(config, workdir) for config, workdir in zip(configs, workdirs)]
-res = report(runs)
+res = [analyze(data, workdir) for data, workdir in zip(runs, workdirs)]
+final = report(res)
 
-dot_graph(res.dask)
-res.compute(get=get)
+dot_graph(final.dask)
+final.compute(get=get)
 
