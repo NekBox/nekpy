@@ -3,9 +3,8 @@
 import json
 from os import chdir, makedirs
 from dask.imperative import delayed, value
-from subprocess import call, check_output, DEVNULL
 from copy import deepcopy
-
+from metal import genrun, nekrun, nekanalyze
 
 def configure(base, override, workdir):
     res = deepcopy(base)
@@ -28,15 +27,13 @@ def prepare(base, tusr):
     with open("cf.tusr", "w") as f:
         f.write(tusr)
 
-    cmd = ["/home/maxhutch/src/nek-tools/genrun/genrun.py", "-d",  "./cf.json", "-u",  "./cf.tusr", "--makenek=/home/maxhutch/src/NekBox/makenek", "test"]
-    call(cmd, stdout=DEVNULL)
+    genrun("cf.json", "cf.tusr", "/home/maxhutch/src/NekBox/makenek", "test")
     return base
 
 @delayed
 def run(config):
     chdir(config["workdir"]) 
-    cmd = ["/home/maxhutch/bin/nekmpi", "test", "{}".format(int(config["procs"]))]
-    res = check_output(cmd)
+    log = nekrun("test", config["procs"])
     config['runstat'] = 1
     return config
 
@@ -49,10 +46,7 @@ def analyze(config, res):
     else:
         first_frame = config["restart"] + 1
         last_frame = first_frame + config["num_steps"] / config["io_step"] - 1
-    cmd = ["/home/maxhutch/src/nek-analyze/load.py", "./test", 
-            "-f", "{:d}".format(int(first_frame)), 
-            "-e", "{:d}".format(int(last_frame))]
-    rstat = call(cmd)
+    rstat = nekanalyze("test", first_frame, last_frame)
     config['analyzestat'] = rstat
     res.update(config)
     return res
