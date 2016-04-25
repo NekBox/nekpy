@@ -58,7 +58,8 @@ with open(argv[1], "r") as f:
 with open(argv[2], "r") as f:
     sweeps = json.load(f)
 
-tusr = argv[3]
+with open(argv[3], "r") as f:
+    tusr = f.read()
 
 overrides = list(outer_product(sweeps))
 workdirs = [work_name(x) for x in overrides]

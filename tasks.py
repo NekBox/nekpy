@@ -25,7 +25,10 @@ def prepare(base, tusr):
     with open("cf.json", "w") as f:
         json.dump(base, f, indent=2)
 
-    cmd = ["/home/maxhutch/src/nek-tools/genrun/genrun.py", "-d",  "./cf.json", "-u",  "{}".format(tusr), "--makenek=/home/maxhutch/src/NekBox/makenek", "test"]
+    with open("cf.tusr", "w") as f:
+        f.write(tusr)
+
+    cmd = ["/home/maxhutch/src/nek-tools/genrun/genrun.py", "-d",  "./cf.json", "-u",  "./cf.tusr", "--makenek=/home/maxhutch/src/NekBox/makenek", "test"]
     call(cmd, stdout=DEVNULL)
     return base
 
