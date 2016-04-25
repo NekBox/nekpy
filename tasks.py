@@ -1,10 +1,10 @@
-#!/home/maxhutch/anaconda3/bin/python3
-
 import json
 from os import chdir, makedirs
 from dask.imperative import delayed, value
 from copy import deepcopy
 from metal import genrun, nekrun, nekanalyze
+
+makenek = "/home/maxhutch/src/NekBox/makenek"
 
 delayed = delayed(pure=True)
 
@@ -29,7 +29,7 @@ def prepare(base, tusr, make=True):
     with open("cf.tusr", "w") as f:
         f.write(tusr)
 
-    genrun("cf.json", "cf.tusr", "/home/maxhutch/src/NekBox/makenek", base["job_name"], make=make)
+    genrun("cf.json", "cf.tusr", makenek, base["job_name"], make=make)
     return base
 
 @delayed

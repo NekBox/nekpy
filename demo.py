@@ -1,7 +1,7 @@
 #!/home/maxhutch/anaconda3/bin/python3
 
 import json
-from os import chdir, makedirs
+from os import chdir, makedirs, getcwd
 from dask.imperative import delayed, value
 from subprocess import call
 from dask.dot import dot_graph
@@ -72,7 +72,7 @@ for ov in overrides:
     ov["name"] = work_name(base["prefix"], ov)
 
 from os.path import join
-workdirs = [join("/home/maxhutch/src/nek_dask", x["name"]) for x in overrides]
+workdirs = [join(getcwd(), x["name"]) for x in overrides]
 configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
 res = [series(config, tusr, job_step = 25) for config in configs]
 final = report(res)
