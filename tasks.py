@@ -6,6 +6,8 @@ from dask.imperative import delayed, value
 from copy import deepcopy
 from metal import genrun, nekrun, nekanalyze
 
+delayed = delayed(pure=True)
+
 def configure(base, override, workdir):
     res = deepcopy(base)
     res = dict(list(res.items()) + list(override.items()))
