@@ -3,7 +3,7 @@
 import json
 from os import chdir, makedirs
 from dask.imperative import delayed, value
-from subprocess import call
+from subprocess import call, check_output, DEVNULL
 from copy import deepcopy
 
 
@@ -26,24 +26,33 @@ def prepare(base, tusr):
         json.dump(base, f, indent=2)
 
     cmd = ["/home/maxhutch/src/nek-tools/genrun/genrun.py", "-d",  "./cf.json", "-u",  "{}".format(tusr), "--makenek=/home/maxhutch/src/NekBox/makenek", "test"]
-    call(cmd)
+    call(cmd, stdout=DEVNULL)
     return base
 
 @delayed
 def run(config):
     chdir(config["workdir"]) 
     cmd = ["/home/maxhutch/bin/nekmpi", "test", "{}".format(int(config["procs"]))]
-    res = call(cmd)
-    config['runstat'] = res
+    res = check_output(cmd)
+    config['runstat'] = 1
     return config
 
 @delayed
-def analyze(config):
+def analyze(config, res):
     chdir(config["workdir"])
-    cmd = ["/home/maxhutch/src/nek-analyze/load.py", "./test", "-f", "1", "-e", "2"]
-    res = call(cmd)
-    config['analyzestat'] = res
-    return config
+    if config["restart"] == 0:
+        first_frame = 1
+        last_frame = config["num_steps"] / config["io_step"] + 1
+    else:
+        first_frame = config["restart"] + 1
+        last_frame = first_frame + config["num_steps"] / config["io_step"] - 1
+    cmd = ["/home/maxhutch/src/nek-analyze/load.py", "./test", 
+            "-f", "{:d}".format(int(first_frame)), 
+            "-e", "{:d}".format(int(last_frame))]
+    rstat = call(cmd)
+    config['analyzestat'] = rstat
+    res.update(config)
+    return res
 
 @delayed
 def report(configs):

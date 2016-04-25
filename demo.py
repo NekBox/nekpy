@@ -20,6 +20,8 @@ def series(base, tusr, job_step = 0, job_time = 0.):
 
     restart = 0
     end_time = job_time
+    res = {}
+    data = deepcopy(base)
     for i in range(njob):
         diff = {"restart": restart}
         restart += nio
@@ -31,11 +33,12 @@ def series(base, tusr, job_step = 0, job_time = 0.):
         if job_time > 0:
             diff["end_time"] = end_time
             end_time += job_time
-        config = update_config(base, diff)
-        config = prepare(config, tusr)
-        base = run(config)
+        config = update_config(data, diff)
+        inp = prepare(config, tusr)
+        data = run(inp)
+        res = analyze(data, res)
 
-    return base
+    return res
 
 from sys import argv
 with open(argv[1], "r") as f:
@@ -43,16 +46,18 @@ with open(argv[1], "r") as f:
 
 tusr = argv[2]
 
-courants = [0.3, 0.4]
-#courants = [0.1]
+courants = [0.1, 0.2, 0.3, 0.4]
 overrides = [{"courant": x} for x in courants]
 workdirs = ["/home/maxhutch/src/nek_dask/test_{}".format(x) for x in courants]
 configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
-# = [prepare(base, tusr, override, workdir) for override, workdir in zip(overrides, workdirs)]
-runs = [series(config, tusr, job_step = 50) for config in configs]
-res = [analyze(data) for data in runs]
+res = [series(config, tusr, job_step = 25) for config in configs]
 final = report(res)
 
 dot_graph(final.dask)
-final.compute(get=get)
+from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfiler
+with ProgressBar(), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
+    final.compute(get=get)
+
+from dask.diagnostics import visualize
+#visualize([prof, rprof])
 
