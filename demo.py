@@ -14,8 +14,8 @@ from itertools import product
 def outer_product(options):
     return (dict(zip(options, x)) for x in product(*options.values()))
 
-def work_name(options):
-    res = "/home/maxhutch/src/nek_dask/test"
+def work_name(prefix, options):
+    res = prefix
     for key, val in options.items():
         res = res + "_{}_{}".format(key, val)
     return res
@@ -33,6 +33,8 @@ def series(base, tusr, job_step = 0, job_time = 0.):
     end_time = job_time
     res = {}
     data = deepcopy(base)
+    data["job_name"] = base["name"]
+    data = prepare(data, tusr)
     for i in range(njob):
         diff = {"restart": restart}
         restart += nio
@@ -44,8 +46,9 @@ def series(base, tusr, job_step = 0, job_time = 0.):
         if job_time > 0:
             diff["end_time"] = end_time
             end_time += job_time
+        diff["job_name"] = "{}-{}".format(base["name"], i)
         config = update_config(data, diff)
-        inp = prepare(config, tusr)
+        inp = prepare(config, tusr, make=False)
         data = run(inp)
         res = analyze(data, res)
 
@@ -61,8 +64,15 @@ with open(argv[2], "r") as f:
 with open(argv[3], "r") as f:
     tusr = f.read()
 
+base["prefix"] = sweeps["prefix"]
+del sweeps["prefix"]
+
 overrides = list(outer_product(sweeps))
-workdirs = [work_name(x) for x in overrides]
+for ov in overrides:
+    ov["name"] = work_name(base["prefix"], ov)
+
+from os.path import join
+workdirs = [join("/home/maxhutch/src/nek_dask", x["name"]) for x in overrides]
 configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
 res = [series(config, tusr, job_step = 25) for config in configs]
 final = report(res)

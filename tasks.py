@@ -15,7 +15,7 @@ def configure(base, override, workdir):
     return res 
 
 @delayed
-def prepare(base, tusr):
+def prepare(base, tusr, make=True):
     try:
         makedirs(base["workdir"])
     except OSError:
@@ -27,13 +27,13 @@ def prepare(base, tusr):
     with open("cf.tusr", "w") as f:
         f.write(tusr)
 
-    genrun("cf.json", "cf.tusr", "/home/maxhutch/src/NekBox/makenek", "test")
+    genrun("cf.json", "cf.tusr", "/home/maxhutch/src/NekBox/makenek", base["job_name"], make=make)
     return base
 
 @delayed
 def run(config):
     chdir(config["workdir"]) 
-    log = nekrun("test", config["procs"])
+    log = nekrun(config["job_name"], config["name"], config["procs"])
     config['runstat'] = 1
     return config
 
@@ -46,7 +46,7 @@ def analyze(config, res):
     else:
         first_frame = config["restart"] + 1
         last_frame = first_frame + config["num_steps"] / config["io_step"] - 1
-    rstat = nekanalyze("test", first_frame, last_frame)
+    rstat = nekanalyze(config["name"], first_frame, last_frame)
     config['analyzestat'] = rstat
     res.update(config)
     return res
