@@ -16,7 +16,7 @@ def outer_product(options):
 
 def work_name(prefix, options):
     res = prefix
-    for key, val in options.items():
+    for key, val in sorted(options.items()):
         res = res + "_{}_{}".format(key, val)
     return res
 
