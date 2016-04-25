@@ -9,6 +9,17 @@ from dask.multiprocessing import get
 from copy import deepcopy
 from tasks import *
 
+from itertools import product
+
+def outer_product(options):
+    return (dict(zip(options, x)) for x in product(*options.values()))
+
+def work_name(options):
+    res = "/home/maxhutch/src/nek_dask/test"
+    for key, val in options.items():
+        res = res + "_{}_{}".format(key, val)
+    return res
+
 def series(base, tusr, job_step = 0, job_time = 0.):
     if job_step > 0:
         njob = int(base["num_steps"] / job_step)
@@ -44,11 +55,13 @@ from sys import argv
 with open(argv[1], "r") as f:
     base = json.load(f)
 
-tusr = argv[2]
+with open(argv[2], "r") as f:
+    sweeps = json.load(f)
 
-courants = [0.1, 0.2, 0.3, 0.4]
-overrides = [{"courant": x} for x in courants]
-workdirs = ["/home/maxhutch/src/nek_dask/test_{}".format(x) for x in courants]
+tusr = argv[3]
+
+overrides = list(outer_product(sweeps))
+workdirs = [work_name(x) for x in overrides]
 configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
 res = [series(config, tusr, job_step = 25) for config in configs]
 final = report(res)
