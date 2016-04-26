@@ -36,6 +36,8 @@ def prepare(base, tusr, make=True):
 def run(config):
     chdir(config["workdir"]) 
     log = nekrun(config["job_name"], config["name"], config["procs"])
+    with open("{}.stdout".format(config["job_name"]), "w") as f:
+      f.write(log)
     config['runstat'] = 1
     return config
 

@@ -15,13 +15,14 @@ def genrun(d, u, path, name, make=True):
 
 def nekrun(name, job_name, procs):
     cmd = [nekmpi_path, name, "{}".format(int(procs)), job_name]
-    log = check_output(cmd)
+    log = check_output(cmd).decode()
     return log
 
 def nekanalyze(name, start, end):
     cmd = [load_path, "./{}".format(name), 
             "-f", "{:d}".format(int(start)), 
-            "-e", "{:d}".format(int(end))]
+            "-e", "{:d}".format(int(end)),
+            "--single_pos"]
     rstat = call(cmd, stdout=DEVNULL)
     return rstat
 
