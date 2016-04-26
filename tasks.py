@@ -42,12 +42,16 @@ def run(config):
 @delayed
 def analyze(config, res):
     chdir(config["workdir"])
+    if config["io_time"] > 0.:
+        output_per_job = config["job_time"] / config["io_time"]
+    else:
+        output_per_job = config["num_steps"] / config["io_step"]
     if config["restart"] == 0:
         first_frame = 1
-        last_frame = config["num_steps"] / config["io_step"] + 1
+        last_frame = output_per_job + 1
     else:
         first_frame = config["restart"] + 1
-        last_frame = first_frame + config["num_steps"] / config["io_step"] - 1
+        last_frame = first_frame + output_per_job - 1
     rstat = nekanalyze(config["name"], first_frame, last_frame)
     config['analyzestat'] = rstat
     res.update(config)
