@@ -10,7 +10,7 @@ delayed = delayed(pure=True)
 
 def configure(base, override, workdir):
     res = deepcopy(base)
-    res = dict(list(res.items()) + list(override.items()))
+    res.update(override)
     res["workdir"] = workdir
     if res["io_step"] == 0:
         res["io_step"] = 100000000
