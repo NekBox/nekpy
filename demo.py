@@ -2,10 +2,11 @@
 
 import json
 from os import chdir, makedirs, getcwd
-from dask.imperative import delayed, value
+from dask.delayed import delayed, value
 from subprocess import call
 from dask.dot import dot_graph
-from dask.multiprocessing import get
+#from dask.multiprocessing import get
+from dask.async import get_sync as get
 from copy import deepcopy
 from tasks import *
 
@@ -77,9 +78,22 @@ configs = [configure(base, override, workdir) for override, workdir in zip(overr
 res = [series(config, tusr, job_step = 25) for config in configs]
 final = report(res)
 
+from dask.callbacks import Callback
+from os import getcwd
+from os.path import join
+class NekCallback(Callback):
+    def __init__(self, case):
+        self.case = case
+        self.cwd  = getcwd()
+
+    def _posttask(self, key, result, dsk, state, id):
+        with open(join(self.cwd, "{}.cache".format(self.case["prefix"])), "w") as f:
+            json.dump(state['cache'], f)
+        return
+
 dot_graph(final.dask)
 from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfiler
-with ProgressBar(), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
+with ProgressBar(), NekCallback(base), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
     final.compute(get=get)
 
 from dask.diagnostics import visualize
