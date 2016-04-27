@@ -74,6 +74,7 @@ overrides = list(outer_product(sweeps))
 for ov in overrides:
     ov["name"] = work_name(base["prefix"], ov)
 
+
 from os.path import join
 workdirs = [join(getcwd(), x["name"]) for x in overrides]
 configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
@@ -87,12 +88,14 @@ class NekCallback(Callback):
     def __init__(self, case):
         self.case = case
         self.cwd  = getcwd()
+        self.cache = {}
         if exists(join(self.cwd, "HALT")):
             remove(join(self.cwd, "HALT"))
 
     def _posttask(self, key, result, dsk, state, id):
+        self.cache.update(state['cache'])
         with open(join(self.cwd, "{}.cache".format(self.case["prefix"])), "w") as f:
-            json.dump(state['cache'], f)
+            json.dump(self.cache, f)
 
         if exists(join(self.cwd, "HALT")):
             for k in state['ready']:
@@ -107,10 +110,15 @@ class NekCallback(Callback):
 full_dask = toolz.merge(val.dask for val in res)
 full_keys = [val._key for val in res]
 
+cache = {}
+if exists("{}.cache".format(base["prefix"])):
+    with open("{}.cache".format(base["prefix"]), "r") as f:
+        cache = json.load(f)
+
 dot_graph(full_dask)
 from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfiler
 with ProgressBar(), NekCallback(base), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
-    final = get(full_dask, full_keys)
+    final = get(full_dask, full_keys, cache=cache)
 #    final.compute(get=get)
 
 from dask.diagnostics import visualize
