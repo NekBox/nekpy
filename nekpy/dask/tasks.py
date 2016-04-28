@@ -3,6 +3,7 @@ from os import chdir, makedirs
 from dask.delayed import delayed, value
 from copy import deepcopy
 from ..config import config as cfg
+from ..tools.genrun import genrun
 
 from importlib import import_module
 metal = import_module(".metal", "nekpy.dask")
@@ -24,13 +25,8 @@ def prepare(base, tusr, make=True):
     except OSError:
         pass
     chdir(base["workdir"]) 
-    with open("cf.json", "w") as f:
-        json.dump(base, f, indent=2)
 
-    with open("cf.tusr", "w") as f:
-        f.write(tusr)
-
-    metal.genrun("cf.json", "cf.tusr", cfg.makenek, base["job_name"], make=make)
+    genrun(base["job_name"], base, tusr, do_make = make, makenek=cfg.makenek)
     return base
 
 @delayed

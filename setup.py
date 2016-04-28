@@ -27,5 +27,7 @@ setup(name='nekpy',
                             .split('\n')),
       long_description=(open('README.rst').read() if exists('README.rst')
                               else ''),
-      packages=['nekpy', 'nekpy.dask'],
-      zip_safe=True)
+      packages=['nekpy', 'nekpy.dask', 'nekpy.tools'],
+      package_dir={'nekpy.tools': 'nekpy/tools'},
+      package_data={'nekpy.tools': ['default.json', 'template*']}, 
+      zip_safe=False)

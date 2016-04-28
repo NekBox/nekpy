@@ -1,0 +1,23 @@
+tmp.rea
+{dim}                  spatial dimension  ( < 0 --> generate .rea/.re2 pair)
+{num_fields}            number of fields
+#=======================================================================
+#
+#    Example of .box file for channel flow
+#
+#    If nelx (y or z) < 0, then genbox automatically generates the
+#                          grid spacing in the x (y or z) direction
+#                          with a geometric ratio given by "ratio".
+#                          ( ratio=1 implies uniform spacing )
+#
+#    Note that the character bcs _must_ have 3 spaces.
+#
+#=======================================================================
+#
+Box
+-{shape_mesh[0]} -{shape_mesh[1]} -{shape_mesh[2]}    nelx,nely,nelz for Box
+{root_mesh[0]: E} {extent_mesh[0]: E} {scale_mesh[0]: E} x0,x1,gain  (can be rescaled in usrdat)
+{root_mesh[1]: E} {extent_mesh[1]: E} {scale_mesh[1]: E} y0,y1,gain  (can be rescaled in usrdat)
+{root_mesh[2]: E} {extent_mesh[2]: E} {scale_mesh[2]: E} z0,z1,gain  (can be rescaled in usrdat)
+{left_bound:3s},{right_bound:3s},{back_bound:3s},{front_bound:3s},{bottom_bound:3s},{top_bound:3s} bc's 
+{left_boundv:3s},{right_boundv:3s},{back_boundv:3s},{front_boundv:3s},{bottom_boundv:3s},{top_boundv:3s}  
