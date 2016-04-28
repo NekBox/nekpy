@@ -2,9 +2,12 @@ import json
 from os import chdir, makedirs
 from dask.delayed import delayed, value
 from copy import deepcopy
-from .metal import genrun, nekrun, nekanalyze
+#from .metal import genrun, nekrun, nekanalyze
 
 makenek = "/home/maxhutch/src/NekBox/makenek"
+
+from importlib import import_module
+metal = import_module(".metal", "nekpy.dask")
 
 delayed = delayed(pure=True)
 
@@ -29,13 +32,13 @@ def prepare(base, tusr, make=True):
     with open("cf.tusr", "w") as f:
         f.write(tusr)
 
-    genrun("cf.json", "cf.tusr", makenek, base["job_name"], make=make)
+    metal.genrun("cf.json", "cf.tusr", makenek, base["job_name"], make=make)
     return base
 
 @delayed
 def run(config):
     chdir(config["workdir"]) 
-    log = nekrun(config["job_name"], config["name"], config["procs"])
+    log = metal.nekrun(config["job_name"], config["name"], config["procs"])
     with open("{}.stdout".format(config["job_name"]), "w") as f:
       f.write(log)
     config['runstat'] = 1
@@ -54,7 +57,7 @@ def analyze(config, res):
     else:
         first_frame = config["restart"] + 1
         last_frame = first_frame + output_per_job - 1
-    rstat = nekanalyze(config["name"], first_frame, last_frame)
+    rstat = metal.nekanalyze(config["name"], first_frame, last_frame)
     config['analyzestat'] = rstat
     res.update(config)
     return res
