@@ -20,6 +20,7 @@ install:
 
   # Install dependencies
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
+  - conda install pytest
   - source activate test-environment
   - pip install graphviz
 
