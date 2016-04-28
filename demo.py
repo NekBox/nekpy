@@ -115,6 +115,7 @@ if exists("{}.cache".format(base["prefix"])):
     with open("{}.cache".format(base["prefix"]), "r") as f:
         cache = json.load(f)
 
+full_dask.update(cache)
 dot_graph(full_dask)
 from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfiler
 with ProgressBar(), NekCallback(base), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
