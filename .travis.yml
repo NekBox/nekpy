@@ -20,8 +20,8 @@ install:
 
   # Install dependencies
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
-  - conda install pytest
   - source activate test-environment
+  - conda install pytest
   - pip install graphviz
 
   # Install dask
