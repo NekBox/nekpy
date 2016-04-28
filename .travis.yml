@@ -10,6 +10,18 @@ addons:
         packages:
         - graphviz
 
+before_install:
+  - export ROOT_DIR=`pwd`
+  - sudo apt-get update -qq
+  - sudo apt-get install -y mpich2 libmpich2-dev
+  - sudo apt-get install -y liblapack-dev
+  - sudo apt-get install -y fftw3-dev
+  - sudo apt-get install -y gfortran
+  - cd $HOME
+  - git clone https://github.com/maxhutch/NekBox.git
+  - git clone https://github.com/maxhutch/nek-analyze.git
+  - cd $ROOT_DIR
+
 install:
   # Install conda
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -21,8 +33,8 @@ install:
   # Install dependencies
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install pytest
-  - pip install graphviz
+  - conda install pytest chest
+  - pip install graphviz mapcombine
 
   # Install dask
   - python setup.py install
