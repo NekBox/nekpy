@@ -2,9 +2,7 @@ import json
 from os import chdir, makedirs
 from dask.delayed import delayed, value
 from copy import deepcopy
-#from .metal import genrun, nekrun, nekanalyze
-
-makenek = "/home/maxhutch/src/NekBox/makenek"
+from ..config import config as cfg
 
 from importlib import import_module
 metal = import_module(".metal", "nekpy.dask")
@@ -32,7 +30,7 @@ def prepare(base, tusr, make=True):
     with open("cf.tusr", "w") as f:
         f.write(tusr)
 
-    metal.genrun("cf.json", "cf.tusr", makenek, base["job_name"], make=make)
+    metal.genrun("cf.json", "cf.tusr", cfg.makenek, base["job_name"], make=make)
     return base
 
 @delayed
