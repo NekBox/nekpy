@@ -9,7 +9,7 @@ from dask.dot import dot_graph
 from dask.async import get_sync as get
 from dask import compute
 from copy import deepcopy
-from tasks import *
+from nekpy.dask.tasks import *
 import toolz
 
 from itertools import product
