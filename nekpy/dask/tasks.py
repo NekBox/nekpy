@@ -2,7 +2,7 @@ import json
 from os import chdir, makedirs
 from dask.delayed import delayed, value
 from copy import deepcopy
-from metal import genrun, nekrun, nekanalyze
+from .metal import genrun, nekrun, nekanalyze
 
 makenek = "/home/maxhutch/src/NekBox/makenek"
 
