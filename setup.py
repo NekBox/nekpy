@@ -27,5 +27,5 @@ setup(name='nekpy',
                             .split('\n')),
       long_description=(open('README.rst').read() if exists('README.rst')
                               else ''),
-      packages=['nekpy'],
+      packages=['nekpy', 'nekpy.dask'],
       zip_safe=True)
