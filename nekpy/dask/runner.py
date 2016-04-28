@@ -5,7 +5,6 @@ from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfi
 #from dask.multiprocessing import get
 from dask.dot import dot_graph
 from dask.async import get_sync as get
-from dask import compute
 import toolz
 import json
 
