@@ -35,6 +35,7 @@ install:
   - source activate test-environment
   - conda install pytest chest
   - pip install graphviz mapcombine
+  - pip install git+https://github.com/maxhutch/dask --upgrade
 
   # Install dask
   - python setup.py install
