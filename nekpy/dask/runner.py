@@ -1,7 +1,7 @@
 from dask.callbacks import Callback
 from os import getcwd, remove
 from os.path import join, exists
-from dask.diagnostics import ProgressBar, Profiler, ResourceProfiler, CacheProfiler
+from dask.diagnostics import ProgressBar
 #from dask.multiprocessing import get
 from dask.dot import dot_graph
 from dask.async import get_sync as get
@@ -43,7 +43,7 @@ def run_all(values, base):
     full_dask.update(cache)
     dot_graph(full_dask)
 
-    with ProgressBar(), NekCallback(base), Profiler() as prof, ResourceProfiler(dt=1.0) as rprof:
+    with ProgressBar(), NekCallback(base) as rprof:
         res = get(full_dask, full_keys, cache=cache)
 
     return res
