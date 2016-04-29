@@ -1,5 +1,0 @@
-{
-  "prefix" : "test_sweep",
-  "courant" : [0.3, 0.4],
-  "num_steps": [50, 100]
-}
