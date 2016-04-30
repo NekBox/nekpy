@@ -16,6 +16,8 @@ def configure(base, override, workdir):
     res["workdir"] = workdir
     if res["io_step"] == 0:
         res["io_step"] = 100000000
+    if res["io_time"] == 0:
+        res["io_time"] = res["end_time"]
     return res 
 
 @delayed
