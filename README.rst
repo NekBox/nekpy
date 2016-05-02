@@ -1,7 +1,7 @@
 nekpy
 ======
 
-|Build Status| |Version Status| |Downloads| |Dask Examples|
+|Build Status| |Version Status| |Downloads|
 
 Nek-related utilities in Python.
 
