@@ -23,8 +23,6 @@ def series(base, tusr, job_step = 0, job_time = 0.):
     for i in range(njob):
         diff = {"restart": restart}
         restart += nio
-        if i == 0:
-            restart += 1
 
         if job_step > 0:
             diff["num_steps"] = min(job_step, base["num_steps"] - i*job_step)
