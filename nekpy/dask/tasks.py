@@ -8,6 +8,8 @@ from ..tools.genrun import genrun
 from importlib import import_module
 metal = import_module(".metal", "nekpy.dask")
 
+path = cfg.makenek
+
 delayed = delayed(pure=True)
 
 def configure(base, override, workdir):
@@ -28,7 +30,7 @@ def prepare(base, tusr, make=True):
         pass
     chdir(base["workdir"]) 
 
-    genrun(base["job_name"], base, tusr, do_make = make, makenek=cfg.makenek)
+    genrun(base["job_name"], base, tusr, do_make = make, makenek=path)
     return base
 
 @delayed
