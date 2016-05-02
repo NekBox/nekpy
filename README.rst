@@ -1,4 +1,23 @@
 nekpy
 ======
 
+|Build Status| |Version Status| |Downloads| |Dask Examples|
+
 Nek-related utilities in Python.
+
+Tools
+-------
+`nekpy.tools` supports common pre- and post-processing tasks, such as populating `SIZE`, `rea`, and `usr` files and calling `makenek`. 
+
+LICENSE
+-------
+
+MIT. See `License File <https://github.com/maxhutch/nekpy/blob/master/LICENSE>`__.
+
+.. _documentation: http://dask.pydata.org/en/latest/
+.. |Build Status| image:: https://travis-ci.org/maxhutch/nekpy.svg
+   :target: https://travis-ci.org/maxhutch/nekpy
+.. |Version Status| image:: https://img.shields.io/pypi/v/nekpy.svg
+   :target: https://pypi.python.org/pypi/nekpy/
+.. |Downloads| image:: https://img.shields.io/pypi/dm/nekpy.svg
+   :target: https://pypi.python.org/pypi/nekpy/
