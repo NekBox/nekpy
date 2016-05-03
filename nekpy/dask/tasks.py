@@ -4,6 +4,7 @@ from dask.delayed import delayed, value
 from copy import deepcopy
 from ..config import config as cfg
 from ..tools.genrun import genrun
+from ..tools.genrun import default_config
 
 from importlib import import_module
 metal = import_module(".metal", "nekpy.dask")
@@ -13,7 +14,8 @@ path = cfg.makenek
 delayed = delayed(pure=True)
 
 def configure(base, override, workdir):
-    res = deepcopy(base)
+    res = deepcopy(default_config)
+    res.update(base)
     res.update(override)
     res["workdir"] = workdir
     if res["io_step"] == 0:

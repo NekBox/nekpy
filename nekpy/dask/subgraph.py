@@ -14,6 +14,8 @@ def series(base, tusr, job_step = 0, job_time = 0.):
         nio = 0 # not used
 
     restart = 0
+    out_index = 0
+    nres = max(3, base["torder"])
     end_time = job_time
     res = {}
     data = deepcopy(base)
@@ -21,8 +23,13 @@ def series(base, tusr, job_step = 0, job_time = 0.):
     data["job_time"] = job_time
     data = prepare(data, tusr)
     for i in range(njob):
-        diff = {"restart": restart}
-        restart += nio
+        diff = {"restart": restart, "outind": out_index}
+        if i == 0:
+            restart   += 1
+            out_index += nio + 1
+        else:
+            restart   += nres
+            out_index += nio
 
         if job_step > 0:
             diff["num_steps"] = min(job_step, base["num_steps"] - i*job_step)

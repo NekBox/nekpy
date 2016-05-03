@@ -70,8 +70,8 @@
    6.              p66 output : <0=ascii, else binary
    6.              p67 restart: <0=ascii, else binary
    1000.           p68 iastep: freq for avg_all
-   {restart:f}     p69 restart? > 0 means restart, outputting at frame p69+1
-   0.
+   {outind:f}      p69 start outputting at frame p69+1
+   {restart:f}     p70 restart? > 0 means restart
    0.
    0.
    0.
