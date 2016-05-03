@@ -2,7 +2,6 @@ from dask.callbacks import Callback
 from os import getcwd, remove
 from os.path import join, exists
 from dask.diagnostics import ProgressBar
-from dask.dot import dot_graph
 from dask.multiprocessing import get as get_proc
 import toolz
 import json
@@ -40,7 +39,6 @@ def run_all(values, base, get=get_proc, num_workers = 4):
             cache = json.load(f)
 
     full_dask.update(cache)
-    dot_graph(full_dask)
 
     with ProgressBar(), NekCallback(base) as rprof:
         res = get(full_dask, full_keys, cache=cache, num_workers=num_workers)
