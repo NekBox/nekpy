@@ -16,6 +16,7 @@ before_install:
   - git clone -b async https://github.com/maxhutch/gslib.git
   - cd gslib
   - make
+  - cd ..
   - git clone https://github.com/maxhutch/NekBox.git
   - git clone https://github.com/maxhutch/nek-analyze.git
   - cd $ROOT_DIR
