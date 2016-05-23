@@ -9,6 +9,12 @@ Tools
 -------
 `nekpy.tools` supports common pre- and post-processing tasks, such as populating `SIZE`, `rea`, and `usr` files and calling `makenek`. 
 
+Configuration
+-------------
+
+`nekpy` reads the paths to simulation and tools installations from the `~/.nekpy.json` file, which is created with default values if not present.
+
+
 LICENSE
 -------
 
