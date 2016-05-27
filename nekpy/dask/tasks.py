@@ -5,8 +5,12 @@ from copy import deepcopy
 from ..config import config as cfg
 from ..tools.genrun import genrun
 from ..tools.genrun import default_config
+from .metal import nekrun, nekanalyze
+#import .metal as metal
+#import .dask import metal as metal
 
 from importlib import import_module
+
 metal = import_module(".metal", "nekpy.dask")
 
 path = cfg.makenek
@@ -24,8 +28,7 @@ def configure(base, override, workdir):
         res["io_time"] = res["end_time"]
     return res 
 
-@delayed
-def prepare(base, tusr, make=True):
+def prepare_(base, tusr, make=True):
     try:
         makedirs(base["workdir"])
     except OSError:
@@ -36,9 +39,13 @@ def prepare(base, tusr, make=True):
     return base
 
 @delayed
-def run(config):
+def prepare(base, tusr, make=True):
+    return prepare_(base, tusr, make)
+
+@delayed
+def run(config, path="nekmpi"):
     chdir(config["workdir"]) 
-    log = metal.nekrun(config["job_name"], config["name"], config["procs"])
+    log = nekrun(config["job_name"], config["name"], config["procs"], path)
     with open("{}.stdout".format(config["job_name"]), "w") as f:
       f.write(log)
     config['runstat'] = 1
@@ -57,7 +64,7 @@ def analyze(config, res):
     else:
         first_frame = config["restart"] + 1
         last_frame = first_frame + output_per_job - 1
-    rstat = metal.nekanalyze(config["name"], first_frame, last_frame)
+    rstat = nekanalyze(config["name"], first_frame, last_frame)
     config['analyzestat'] = rstat
     res.update(config)
     return res

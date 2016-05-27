@@ -1,5 +1,13 @@
 from copy import deepcopy
-from .tasks import prepare, update_config, run, analyze
+from .tasks import prepare, update_config, run, analyze, prepare_
+from dask.base import tokenize
+from dask.delayed import delayed
+
+from ..config import config as cfg
+
+nekmpi_path = cfg.nekmpi
+load_path   = cfg.load
+
 
 def series(base, tusr, job_step = 0, job_time = 0.):
     if job_step > 0:
@@ -39,7 +47,7 @@ def series(base, tusr, job_step = 0, job_time = 0.):
         diff["job_name"] = "{}-{}".format(base["name"], i)
         config = update_config(data, diff)
         inp = prepare(config, tusr, make=False)
-        data = run(inp)
+        data = run(inp, nekmpi_path)
         res = analyze(data, res)
 
     return res
