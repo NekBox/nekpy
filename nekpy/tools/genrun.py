@@ -98,11 +98,11 @@ def genrun(name, config_in, tusr,
 
     if legacy:
         shutil.copy("./{:s}.rea".format(name), "./tmp.rea".format(name))
-        system("echo './{:s}.box' | {}".format(name, "genbox"))
+        system("echo './{:s}.box' | {:s}/genbox".format(name, tools))
         shutil.copy("./box.rea", "./{:s}.rea".format(name))
         with open(".tmp", "w") as f:
             f.write("{:s}\n0.01\n".format(name))
-        system("genmap < .tmp")
+        system("{:s}/genmap < .tmp".format(tools))
 
     log = ""
     if do_clean:
