@@ -1,6 +1,9 @@
 import json
 from subprocess import check_output
 from os.path import realpath, join, dirname
+import shutil
+from os import system
+
 from pkg_resources import resource_string
 from ..utils import Struct
 
@@ -22,10 +25,19 @@ with open(join(mypath, "template.rea"), "r") as f:
 with open(join(mypath, "template.box"), "r") as f:
     box_template = f.read()
 
-def genrun(name, config_in, tusr, do_map=False, do_clean=False, do_make=False, makenek="makenek"):
+def genrun(name, config_in, tusr, 
+        do_map=False, 
+        do_clean=False, 
+        do_make=False, 
+        legacy=False, 
+        makenek="makenek",
+        tools=None):
+
     config = {}
     config.update(default_config)
     config.update(config_in)
+
+    legacy = legacy or "legacy" in config_in
 
     with open("{:s}.json".format(name), "w") as f:
         json.dump(config, f, indent=2)
@@ -78,11 +90,19 @@ def genrun(name, config_in, tusr, do_map=False, do_clean=False, do_make=False, m
 
     box = box_template.format(**config)
     with open("{:s}.box".format(name), "w") as f:
-        f.write
+        f.write(box)
     
     usr = tusr.format(**config)
     with open("{:s}.usr".format(name), "w") as f:
         f.write(usr)
+
+    if legacy:
+        shutil.copy("./{:s}.rea".format(name), "./tmp.rea".format(name))
+        system("echo './{:s}.box' | {}".format(name, "genbox"))
+        shutil.copy("./box.rea", "./{:s}.rea".format(name))
+        with open(".tmp", "w") as f:
+            f.write("{:s}\n0.01\n".format(name))
+        system("genmap < .tmp")
 
     log = ""
     if do_clean:
@@ -90,6 +110,7 @@ def genrun(name, config_in, tusr, do_map=False, do_clean=False, do_make=False, m
         log += check_output(cmd).decode() + "\n"
 
     if do_make:
+        print(makenek, name, dirname(makenek))
         cmd = [makenek, name, dirname(makenek)]
         log += check_output(cmd).decode()
 

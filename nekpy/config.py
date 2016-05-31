@@ -11,8 +11,10 @@ class Configuration(Struct):
 
 default_config = Configuration()
 default_config.makenek = join(expanduser("~"), "NekBox/makenek")
+default_config.legacy  = join(expanduser("~"), "Nek5000/makenek")
 default_config.load    = join(expanduser("~"), "nek-analyze/load.py")
 default_config.nekmpi  = join(expanduser("~"), "NekBox/nekmpi")
+default_config.tools   = join(expanduser("~"), "Nek5000/tools")
 
 # grab defaults from config files
 if exists(join(expanduser("~"), ".nekpy.json")):

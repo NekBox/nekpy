@@ -14,6 +14,8 @@ from importlib import import_module
 metal = import_module(".metal", "nekpy.dask")
 
 path = cfg.makenek
+path_legacy = cfg.legacy
+tools_path = cfg.tools
 
 delayed = delayed(pure=True)
 
@@ -28,14 +30,18 @@ def configure(base, override, workdir):
         res["io_time"] = res["end_time"]
     return res 
 
-def prepare_(base, tusr, make=True):
+def prepare_(base, tusr, make=True, legacy=False):
     try:
         makedirs(base["workdir"])
     except OSError:
         pass
     chdir(base["workdir"]) 
 
-    genrun(base["job_name"], base, tusr, do_make = make, makenek=path)
+    if legacy or "legacy" in base:
+        genrun(base["job_name"], base, tusr, do_make = make, legacy=True, makenek=path_legacy, tools=tools_path)
+    else:
+        genrun(base["job_name"], base, tusr, do_make = make, legacy=False, makenek=path, tools=tools_path)
+
     return base
 
 @delayed
