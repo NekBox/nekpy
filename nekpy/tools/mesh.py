@@ -17,7 +17,7 @@ def factor(number):
 def get_ind(ix, iy, iz, n):
   return int(1 + (ix%n[0]) + (iy%n[1]) * n[0] + (iz%n[2]) * n[0] * n[1])
 
-def uniform(ind, num, start, end):
+def uniform_profile(ind, num, start, end):
     """Return uniformly spaced mesh corners"""
     delta = (end - start) / num
     return start + ind * delta, delta
@@ -46,12 +46,12 @@ class Mesh:
     delta  = np.array([0.,0.,0.], dtype=np.float64)
     e = 0.0
     for iz in range(self.n[2]):
-      e_root[2], delta[2] = uniform(iz, self.n[2], self.root[2], self.corner[2])
+      e_root[2], delta[2] = uniform_profile(iz, self.n[2], self.root[2], self.corner[2])
       for iy in range(self.n[1]):
-        e_root[1], delta[1] = uniform(iy, self.n[1], self.root[1], self.corner[1])
+        e_root[1], delta[1] = uniform_profile(iy, self.n[1], self.root[1], self.corner[1])
         for ix in range(self.n[0]):
           #e = ix + iy * self.n[0] + iz * self.n[0]*self.n[1]
-          e_root[0], delta[0] = uniform(ix, self.n[0], self.root[0], self.corner[0])
+          e_root[0], delta[0] = uniform_profile(ix, self.n[0], self.root[0], self.corner[0])
 
           self.elements[e,0]  = e_root[0]
           self.elements[e,1]  = e_root[0] + delta[0]
