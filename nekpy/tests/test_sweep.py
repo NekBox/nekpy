@@ -24,7 +24,7 @@ def test_sweep():
     for ov in overrides:
         ov["name"] = work_name(base["prefix"], ov)
 
-    workdirs = [join(getcwd(), "scratch", x["name"]) for x in overrides]
+    workdirs = [join(getcwd(), "s", x["name"]) for x in overrides]
     configs = [configure(base, override, workdir) for override, workdir in zip(overrides, workdirs)]
     res = [series(config, tusr, job_step = 25) for config in configs]
 
