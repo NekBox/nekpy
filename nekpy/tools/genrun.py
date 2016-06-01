@@ -5,6 +5,7 @@ import shutil
 from os import system
 
 from pkg_resources import resource_string
+from .mesh import Mesh
 from ..utils import Struct
 
 mypath = (realpath(__file__))[:-9]
@@ -71,6 +72,31 @@ def genrun(name, config_in, tusr,
     if c.bottom_bound == 'P':
         c.bottom_boundv = 'P'
 
+
+    if legacy:
+        msh = Mesh(c.root_mesh, c.extent_mesh, c.shape_mesh,
+        [c.left_bound, c.front_bound, c.right_bound, c.back_bound, c.top_bound, c.bottom_bound])
+        msh.generate_elements()
+        mesh_data = msh.get_mesh_data()
+        msh.generate_faces()
+        fluid_boundaries = msh.get_fluid_boundaries()
+        thermal_boundaries = fluid_boundaries.replace('SYM', 'I  ').replace('W  ', 'I  ')
+
+        mesh_rea = "{}\n  ***** CURVED SIDE DATA *****\n           0 Curved sides follow IEDGE,IEL,CURVE(I),I=1,5, CCURVE\n  ***** BOUNDARY CONDITIONS *****\n  ***** FLUID   BOUNDARY CONDITIONS *****\n{}\n  ***** THERMAL BOUNDARY CONDITIONS *****\n{}".format(mesh_data, fluid_boundaries, thermal_boundaries)
+
+        msh.set_map(c.procs)
+        map_data = msh.get_map()
+    else:
+        mesh_rea = """
+         {elements_total:11d}  3 {elements_total:11d}           NEL,NDIM,NELV
+         {root_mesh[0]: E} {extent_mesh[0]: E} {shape_mesh[0]}
+         {root_mesh[1]: E} {extent_mesh[1]: E} {shape_mesh[1]}
+         {root_mesh[2]: E} {extent_mesh[2]: E} {shape_mesh[2]}
+         {left_bound:3s} {right_bound:3s} {front_bound:3s} {back_bound:3s} {bottom_bound:3s} {top_bound:3s}
+         {left_boundv:3s} {right_boundv:3s} {front_boundv:3s} {back_boundv:3s} {bottom_boundv:3s} {top_boundv:3s}
+          **TAIL OPTS**
+         """.format(**c._attrs)
+
     # writes the current variable scope to the configuration
     config = c._attrs
 
@@ -84,7 +110,7 @@ def genrun(name, config_in, tusr,
     with open("size_mod.F90", "w") as f:
         f.write(size)
 
-    rea = rea_template.format(**config)
+    rea = rea_template.format(mesh_rea=mesh_rea, **config)
     with open("{:s}.rea".format(name), "w") as f:
         f.write(rea)
 
@@ -97,9 +123,9 @@ def genrun(name, config_in, tusr,
         f.write(usr)
 
     if legacy:
-        shutil.copy("./{:s}.rea".format(name), "./tmp.rea".format(name))
-        system("echo './{:s}.box' | {:s}/genbox".format(name, tools))
-        shutil.copy("./box.rea", "./{:s}.rea".format(name))
+        #shutil.copy("./{:s}.rea".format(name), "./tmp.rea".format(name))
+        #system("echo './{:s}.box' | {:s}/genbox".format(name, tools))
+        #shutil.copy("./box.rea", "./{:s}.rea".format(name))
         with open(".tmp", "w") as f:
             f.write("{:s}\n0.01\n".format(name))
         system("{:s}/genmap < .tmp".format(tools))
