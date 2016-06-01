@@ -87,15 +87,13 @@ def genrun(name, config_in, tusr,
         msh.set_map(c.procs)
         map_data = msh.get_map()
     else:
-        mesh_rea = """
-         {elements_total:11d}  3 {elements_total:11d}           NEL,NDIM,NELV
-         {root_mesh[0]: E} {extent_mesh[0]: E} {shape_mesh[0]}
-         {root_mesh[1]: E} {extent_mesh[1]: E} {shape_mesh[1]}
-         {root_mesh[2]: E} {extent_mesh[2]: E} {shape_mesh[2]}
-         {left_bound:3s} {right_bound:3s} {front_bound:3s} {back_bound:3s} {bottom_bound:3s} {top_bound:3s}
-         {left_boundv:3s} {right_boundv:3s} {front_boundv:3s} {back_boundv:3s} {bottom_boundv:3s} {top_boundv:3s}
-          **TAIL OPTS**
-         """.format(**c._attrs)
+        mesh_rea = """{elements_total:11d}  3 {elements_total:11d}           NEL,NDIM,NELV
+{root_mesh[0]: E} {extent_mesh[0]: E} {shape_mesh[0]}
+{root_mesh[1]: E} {extent_mesh[1]: E} {shape_mesh[1]}
+{root_mesh[2]: E} {extent_mesh[2]: E} {shape_mesh[2]}
+{left_bound:3s} {right_bound:3s} {front_bound:3s} {back_bound:3s} {bottom_bound:3s} {top_bound:3s}
+{left_boundv:3s} {right_boundv:3s} {front_boundv:3s} {back_boundv:3s} {bottom_boundv:3s} {top_boundv:3s}
+ **TAIL OPTS**""".format(**c._attrs)
 
     # writes the current variable scope to the configuration
     config = c._attrs

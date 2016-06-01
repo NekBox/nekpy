@@ -32,7 +32,7 @@ install:
   # Install dependencies
   - conda create -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install pytest chest cloudpickle
+  - conda install pytest chest cloudpickle numpy
   - pip install mapcombine
   - pip install git+https://github.com/maxhutch/dask --upgrade
 
