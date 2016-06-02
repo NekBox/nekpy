@@ -8,6 +8,7 @@ Nek-related utilities in Python.
 Tools
 -------
 `nekpy.tools` supports common pre- and post-processing tasks, such as populating `SIZE`, `rea`, and `usr` files and calling `makenek`. 
+For the special case of single boxes, `nekpy.tools` can also generate meshes and map file.
 
 Configuration
 -------------
