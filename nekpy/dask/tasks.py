@@ -31,6 +31,11 @@ def configure(base, override, workdir):
         res["io_time"] = res["end_time"]
     return res 
 
+def update_config(base, diff):
+    res = deepcopy(base)
+    res.update(diff)
+    return res
+
 def prepare_(base, tusr, make=True, legacy=False, dep=None):
     try:
         makedirs(base["workdir"])
@@ -47,7 +52,7 @@ def prepare_(base, tusr, make=True, legacy=False, dep=None):
 
 def prepare(base, tusr, make=True, legacy=False, dep=None):
     name = "prepare-{}".format(base["job_name"]) 
-    return delayed(prepare_, name=name, pure=True)(base, tusr, make, legacy, dep, dask_key_name=name)
+    return delayed(prepare_)(base, tusr, make, legacy, dep, dask_key_name=name)
 
 def run_(config, path="nekmpi", dep=None):
     chdir(config["workdir"]) 
@@ -59,10 +64,9 @@ def run_(config, path="nekmpi", dep=None):
 
 def run(config, path="nekmpi", dep=None):
     name = "run-{}".format(config["job_name"])
-    return delayed(run_, name=name, pure=True)(config, path, dep, dask_key_name=name)
+    return delayed(run_)(config, path, dep, dask_key_name=name)
 
-@delayed
-def analyze(config, res, dep=None):
+def analyze_(config, res, dep=None):
     chdir(config["workdir"])
     if config["io_time"] > 0.:
         output_per_job = config["job_time"] / config["io_time"]
@@ -79,13 +83,7 @@ def analyze(config, res, dep=None):
     res.update(config)
     return res
 
-@delayed
-def report(configs):
-    print(len(configs))
-    return
-
-def update_config(base, diff):
-    res = deepcopy(base)
-    res.update(diff)
-    return res
+def analyze(config, res, dep=None):
+    name = "analyze-{}".format(config["job_name"])
+    return delayed(analyze_)(config, res, dep, dask_key_name=name)
 
