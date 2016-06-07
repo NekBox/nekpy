@@ -41,6 +41,6 @@ def run_all(values, base, get=get_proc, num_workers = 4):
     full_dask.update(cache)
 
     with ProgressBar(), NekCallback(base) as rprof:
-        res = get(full_dask, full_keys, cache=cache, num_workers=num_workers)
+        res = get(full_dask, full_keys, cache=cache, num_workers=num_workers, optimize_graph=False)
 
     return res
