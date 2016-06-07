@@ -6,6 +6,7 @@ from ..config import config as cfg
 from ..tools.genrun import genrun
 from ..tools.genrun import default_config
 from .metal import nekrun, nekanalyze
+from hashlib import md5
 #import .metal as metal
 #import .dask import metal as metal
 
@@ -44,18 +45,21 @@ def prepare_(base, tusr, make=True, legacy=False):
 
     return base
 
-@delayed
 def prepare(base, tusr, make=True):
-    return prepare_(base, tusr, make)
+    name = "prepare-{}".format(base["job_name"]) 
+    return delayed(prepare_, name=name, pure=True)(base, tusr, make)
 
-@delayed
-def run(config, path="nekmpi"):
+def run_(config, path="nekmpi"):
     chdir(config["workdir"]) 
     log = nekrun(config["job_name"], config["name"], config["procs"], path)
     with open("{}.stdout".format(config["job_name"]), "w") as f:
       f.write(log)
     config['runstat'] = 1
     return config
+
+def run(config, path="nekmpi"):
+    name = "run-{}".format(config["job_name"])
+    return delayed(run_, name=name, pure=True)(config, path)
 
 @delayed
 def analyze(config, res):
