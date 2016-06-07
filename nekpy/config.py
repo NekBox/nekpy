@@ -11,7 +11,7 @@ class Configuration(Struct):
 
 default_config = Configuration()
 default_config.makenek = join(expanduser("~"), "NekBox/makenek")
-default_config.legacy  = join(expanduser("~"), "Nek5000/makenek")
+default_config.legacy  = join(expanduser("~"), "Nek5000/core/makenek")
 default_config.load    = join(expanduser("~"), "nek-analyze/load.py")
 default_config.nekmpi  = join(expanduser("~"), "NekBox/bin/nekmpi")
 default_config.tools   = join(expanduser("~"), "Nek5000/tools")
