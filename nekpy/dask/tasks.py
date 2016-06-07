@@ -31,7 +31,7 @@ def configure(base, override, workdir):
         res["io_time"] = res["end_time"]
     return res 
 
-def prepare_(base, tusr, make=True, legacy=False):
+def prepare_(base, tusr, make=True, legacy=False, dep=None):
     try:
         makedirs(base["workdir"])
     except OSError:
@@ -43,26 +43,26 @@ def prepare_(base, tusr, make=True, legacy=False):
     else:
         genrun(base["job_name"], base, tusr, do_make = make, legacy=False, makenek=path, tools=tools_path)
 
-    return base
+    return ""
 
-def prepare(base, tusr, make=True):
+def prepare(base, tusr, make=True, legacy=False, dep=None):
     name = "prepare-{}".format(base["job_name"]) 
-    return delayed(prepare_, name=name, pure=True)(base, tusr, make)
+    return delayed(prepare_, name=name, pure=True)(base, tusr, make, legacy, dep, dask_key_name=name)
 
-def run_(config, path="nekmpi"):
+def run_(config, path="nekmpi", dep=None):
     chdir(config["workdir"]) 
     log = nekrun(config["job_name"], config["name"], config["procs"], path)
     with open("{}.stdout".format(config["job_name"]), "w") as f:
       f.write(log)
-    config['runstat'] = 1
-    return config
 
-def run(config, path="nekmpi"):
+    return log
+
+def run(config, path="nekmpi", dep=None):
     name = "run-{}".format(config["job_name"])
-    return delayed(run_, name=name, pure=True)(config, path)
+    return delayed(run_, name=name, pure=True)(config, path, dep, dask_key_name=name)
 
 @delayed
-def analyze(config, res):
+def analyze(config, res, dep=None):
     chdir(config["workdir"])
     if config["io_time"] > 0.:
         output_per_job = config["job_time"] / config["io_time"]
@@ -84,7 +84,6 @@ def report(configs):
     print(len(configs))
     return
 
-@delayed
 def update_config(base, diff):
     res = deepcopy(base)
     res.update(diff)
