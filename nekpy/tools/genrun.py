@@ -40,6 +40,11 @@ def genrun(name, config_in, tusr,
 
     legacy = legacy or "legacy" in config_in
 
+    if legacy:
+        nek_dir = join(dirname(makenek),"..")
+    else:
+        nek_dir = dirname(makenek)
+
     with open("{:s}.json".format(name), "w") as f:
         json.dump(config, f, indent=2)
 
@@ -139,12 +144,12 @@ def genrun(name, config_in, tusr,
 
     log = ""
     if do_clean:
-        cmd = [makenek, "clean" , dirname(makenek)]
+        cmd = [makenek, "clean" , nek_dir]
         log += check_output(cmd).decode() + "\n"
 
     if do_make:
-        print(makenek, name, dirname(makenek))
-        cmd = [makenek, name, dirname(makenek)]
+        print(makenek, name, nek_dir)
+        cmd = [makenek, name, nek_dir] 
         log += check_output(cmd).decode()
 
     return log
