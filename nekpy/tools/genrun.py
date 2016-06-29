@@ -54,7 +54,7 @@ def genrun(name, config_in, tusr,
     c = Struct(config)
 
     c.dealiasing_order = c.order * 3 / 2
-    c.ltorder = abs(c.torder)
+    c.ltorder = max(abs(c.torder), abs(c.tstage))
 
     # Manipulate the configuration here
     c.elements_total = c.shape_mesh[0] * c.shape_mesh[1] * c.shape_mesh[2]
