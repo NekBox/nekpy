@@ -74,5 +74,7 @@
   "t_boundary" : 0.0,
   "torder" : 3.0,
   "tstage" : -1.0,
+  "flow_dir" : 0.0,
+  "flowrate" : 0.0,
   "io_pad" : 23
 }

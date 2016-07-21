@@ -55,8 +55,8 @@
    0.
    0.              p52 IOHIS
    0.
-   0.              p54 1,2,3-->fixed flow rate dir=x,y,z
-   0.              p55 vol.flow rate (p54>0) or Ubar (p54<0)
+   {flow_dir:f}    p54 1,2,3-->fixed flow rate dir=x,y,z
+   {flowrate:f}    p55 vol.flow rate (p54>0) or Ubar (p54<0)
    0.
    0.
    0.
