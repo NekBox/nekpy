@@ -40,6 +40,11 @@ def genrun(name, config_in, tusr,
 
     legacy = legacy or "legacy" in config_in
 
+    if legacy:
+        nek_dir = join(dirname(makenek),"..")
+    else:
+        nek_dir = dirname(makenek)
+
     with open("{:s}.json".format(name), "w") as f:
         json.dump(config, f, indent=2)
 
@@ -49,7 +54,7 @@ def genrun(name, config_in, tusr,
     c = Struct(config)
 
     c.dealiasing_order = c.order * 3 / 2
-    c.ltorder = abs(c.torder)
+    c.ltorder = max(abs(c.torder), abs(c.tstage))
 
     # Manipulate the configuration here
     c.elements_total = c.shape_mesh[0] * c.shape_mesh[1] * c.shape_mesh[2]
@@ -139,12 +144,43 @@ def genrun(name, config_in, tusr,
 
     log = ""
     if do_clean:
-        cmd = [makenek, "clean" , dirname(makenek)]
+        cmd = [makenek, "clean" , nek_dir]
         log += check_output(cmd).decode() + "\n"
 
     if do_make:
-        print(makenek, name, dirname(makenek))
-        cmd = [makenek, name, dirname(makenek)]
+        print(makenek, name, nek_dir)
+        cmd = [makenek, name, nek_dir] 
         log += check_output(cmd).decode()
 
     return log
+
+if __name__ is "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Generate NEK inputs")
+    parser.add_argument('name', help="Name to assign to generated system")
+    parser.add_argument('-d', '--dict', dest='config', help="Dictionary of parametesr (JSON)")
+    parser.add_argument('-u', '--usr', dest='usr', help="*.usr file to use for build")
+    parser.add_argument('-n', '--nproc', dest='np', type=int, default=-1, help="Number of processes to target")
+    parser.add_argument('-l', '--legacy', dest='legacy', default=False, action="store_true", help="Legacy Nek5000 support (instead of NekBox)")
+    parser.add_argument('--map', dest='map', default=False, action="store_true", help="Make a map file.  genmap if legacy, internal otherwise.")
+    parser.add_argument('--makenek', dest='makenek', default="makenek", help="Path to makenek")
+    parser.add_argument('--clean', dest='clean', default=False, action="store_true", help="Clean before making")
+    parser.add_argument('--tdir', dest='tdir', default='.',  help="Directory to build in")
+    parser.add_argument('--no-make', dest='make', default=True, action="store_false", help="Don't run makenek")
+    parser.add_argument('--override', dest='override', type=json.loads, default={}, help="JSON overrides")    
+
+    args = parser.parse_args()
+
+    with open(args.config, 'r') as f:
+        loaded_config = json.load(f)
+
+    config = dict(list(loaded_config.items()) + list(args.override.items()))
+
+    with open(args.usr, "r") as f:
+        usr_template = f.read()
+
+    genrun(args.name, config, usr_template, 
+        do_map=args.map, do_clean=args.clean, do_make=args.make, 
+        legacy=args.legacy, 
+        makenek=args.makenek,
+        tools=None)

@@ -22,9 +22,18 @@ def uniform_profile(ind, num, start, end):
     delta = (end - start) / num
     return start + ind * delta, delta
 
+def pick_profile(prof):
+    if prof == "uniform":
+        return uniform_profile
+    return None
+
 class Mesh:
 
-  def __init__(self, root, corner, n, boundaries):
+  def __init__(self, root, corner, n, boundaries, 
+               profile_x = 'uniform',
+               profile_y = 'uniform',
+               profile_z = 'uniform'):
+
     import numpy as np
     self.root = np.array(root, dtype=np.float64)
     self.corner = np.array(corner, dtype=np.float64)
@@ -37,6 +46,11 @@ class Mesh:
     self.element_bounds = None
     self.elements = None
     self.map = None
+
+    self.profile_x = pick_profile(profile_x)
+    self.profile_y = pick_profile(profile_y)
+    self.profile_z = pick_profile(profile_z)
+
     return
 
   def generate_elements(self):
@@ -44,14 +58,13 @@ class Mesh:
     self.elements = np.zeros((np.prod(self.n), 24), dtype=np.float64)  
     e_root = np.array([0.,0.,0.], dtype=np.float64)
     delta  = np.array([0.,0.,0.], dtype=np.float64)
-    e = 0.0
+    e = 0
     for iz in range(self.n[2]):
-      e_root[2], delta[2] = uniform_profile(iz, self.n[2], self.root[2], self.corner[2])
+      e_root[2], delta[2] = self.profile_z(iz, self.n[2], self.root[2], self.corner[2])
       for iy in range(self.n[1]):
-        e_root[1], delta[1] = uniform_profile(iy, self.n[1], self.root[1], self.corner[1])
+        e_root[1], delta[1] = self.profile_y(iy, self.n[1], self.root[1], self.corner[1])
         for ix in range(self.n[0]):
-          #e = ix + iy * self.n[0] + iz * self.n[0]*self.n[1]
-          e_root[0], delta[0] = uniform_profile(ix, self.n[0], self.root[0], self.corner[0])
+          e_root[0], delta[0] = self.profile_x(ix, self.n[0], self.root[0], self.corner[0])
 
           self.elements[e,0]  = e_root[0]
           self.elements[e,1]  = e_root[0] + delta[0]
@@ -196,21 +209,18 @@ class Mesh:
         tfac.remove(split)
         zfac.remove(split)
         ztot /= split
-        print("Queuing z")
       elif ytot >= xtot :
         split = (set(tfac) & set(yfac)).pop()
         queue.append((1,split))
         tfac.remove(split)
         yfac.remove(split)
         ytot /= split
-        print("Queuing y")
       else : 
         split = (set(tfac) & set(xfac)).pop()
         queue.append((0,split))
         tfac.remove(split)
         xfac.remove(split)
         xtot /= split
-        print("Queuing x")
 
     xtot = int(np.prod(np.array(xfac)))
     ytot = int(np.prod(np.array(yfac)))
@@ -220,17 +230,14 @@ class Mesh:
         split = zfac.pop(0)
         queue.append((2,split))
         ztot /= split
-        print("Filling z")
       elif ytot >= xtot :
         split = yfac.pop(0)
         queue.append((1,split))
         ytot /= split
-        print("Filling y")
       else : 
         split = xfac.pop(0)
         queue.append((0,split))
         xtot /= split
-        print("Filling x")
 
     ind = np.zeros((np.prod(self.n), 4), dtype=np.uint32)
     for e in range(self.elements.shape[0]):

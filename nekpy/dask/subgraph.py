@@ -2,6 +2,7 @@ from copy import deepcopy
 from .tasks import prepare, update_config, run, analyze, prepare_
 from dask.base import tokenize
 from dask.delayed import delayed
+from math import ceil
 
 from ..config import config as cfg
 
@@ -16,8 +17,8 @@ def series(base_in, tusr, job_step = 0, job_time = 0.):
         base["io_step"] = min(base["io_step"], job_step)
         nio = int(job_step / base["io_step"])
     elif job_time > 0:
-        njob = int(base["end_time"] / job_time + .5)
-        nio = int(job_time / base["io_time"] + .5)
+        njob = int(ceil(base["end_time"] / job_time))
+        nio = int(ceil(job_time / base["io_time"]))
     else:
         njob = 1
         nio = 0 # not used

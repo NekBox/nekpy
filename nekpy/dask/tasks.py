@@ -76,7 +76,7 @@ def analyze_(config, res, dep=None):
         first_frame = 1
         last_frame = output_per_job + 1
     else:
-        first_frame = config["restart"] + 1
+        first_frame = config["outind"] + 1
         last_frame = first_frame + output_per_job - 1
     rstat = nekanalyze(config["name"], first_frame, last_frame)
     config['analyzestat'] = rstat
